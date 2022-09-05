@@ -1,0 +1,75 @@
+{
+  "name": "@api/easy-service",
+  "version": "1.0.0",
+  "description": "cli of mock and generate service",
+  "bin": {
+    "easy-service": "dist/bin/easy-service.js"
+  },
+  "scripts": {
+    "setup": "ts-node --project ./tsconfig.json  ./lib/setup.ts",
+    "mock": "nodemon -e ts,tsx --exec cross-env MOCK_PORT=7001 --max_old_space_size=8192 ts-node --project ./tsconfig.json  ./lib/mock-server.ts",
+    "download": "ts-node --project ./tsconfig.json  ./lib/swagger-download.ts",
+    "build": "rm -rf ./dist && tsc --version && tsc --project .",
+    "local": "pnpm run build && local-package-publisher -p",
+    "remove-local": "local-package-publisher -u",
+    "pub": "pnpm run build && npm version patch && npm publish",
+    "pub-release": "pnpm run build && pnpm version minor && pnpm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michael8512/easy-service.git"
+  },
+  "homepage": "https://github.com/michael8512/easy-service/blob/master/README.md",
+  "keywords": [
+    "fast data"
+  ],
+  "author": "michael8512",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "chalk": "^4.1.2",
+    "commander": "^8.1.0",
+    "dotenv": "^16.0.2",
+    "fs": "0.0.1-security",
+    "immer": "^9.0.1",
+    "inquirer": "^8.0.0",
+    "inquirer-select-directory": "^1.2.0",
+    "js-base64": "^3.6.1",
+    "json-server": "^0.16.3",
+    "lodash": "^4.17.21",
+    "mockjs": "^1.1.0",
+    "moment": "^2.29.1",
+    "node-fetch": "^2.6.1",
+    "superagent": "^6.1.0",
+    "ts-json-schema-generator": "^0.93.0",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.2.0",
+    "typescript": "^4.8.2"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^7.3.1",
+    "@types/json-server": "^0.14.3",
+    "@types/lodash": "^4.14.168",
+    "@types/mockjs": "^1.0.3",
+    "@types/node": "^14.14.37",
+    "@types/node-fetch": "^2.5.12",
+    "@types/superagent": "^4.1.12",
+    "cross-env": "^7.0.3",
+    "ignore-loader": "^0.1.2",
+    "local-package-publisher": "^1.0.4",
+    "node-notifier": "^9.0.1",
+    "nodemon": "^2.0.7",
+    "ts-auto-i18n-plugin": "0.0.15",
+    "ts-import-plugin": "^1.6.7",
+    "ts-jest": "^26.5.4",
+    "ts-loader": "^8.1.0"
+  },
+  "browserslist": [
+    "last 2 versions",
+    "Firefox ESR",
+    "> 1%",
+    "ie >= 8",
+    "iOS >= 8",
+    "Android >= 4"
+  ]
+}
