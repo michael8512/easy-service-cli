@@ -251,9 +251,9 @@ export const ${apiName} = apiCreator<(p: ${pType}) => ${bType}>(apis.${apiName})
 };
 
 
-export default async () => {
+export default async (workDir: string) => {
   try {
-    const configPath = path.resolve(process.cwd(), `./easy-service-config/.env`);
+    const configPath = path.resolve(workDir, `./easy-service-config/.env`);
 
     if (!fs.existsSync(configPath)) {
       logError('please make sure the env file exist in the execute path!')

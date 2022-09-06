@@ -28,7 +28,8 @@ program
   .command('generate-service')
   .description('generate service by API swagger')
   .action(async () => {
-    generateService();
+    const workDir = process.cwd()
+    generateService(workDir);
   });
 
 program.parse(process.argv);
