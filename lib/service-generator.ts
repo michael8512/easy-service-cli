@@ -1,7 +1,6 @@
 import path from 'path';
 import fs from 'fs';
 import { logSuccess, logInfo, logError } from './util/log';
-// import http from 'superagent';
 import { walker } from './util/file-walker';
 import { get, forEach, keys } from 'lodash';
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
@@ -212,7 +211,7 @@ const autoGenerateService = (
         resData,
         resType,
       });
-      regRes = fullConfig.REG_API.exec(content);
+      regRes = config.REG_API.exec(content);
     }
 
     forEach(apiList, ({ apiName, parameters, resData, resType }) => {
@@ -255,7 +254,7 @@ export const ${apiName} = apiCreator<(p: ${pType}) => ${bType}>(apis.${apiName})
 export default async ({ workDir }: { workDir: string }) => {
   try {
 
-    const configPath = path.resolve(process.cwd(), `./.env`);
+    const configPath = path.resolve(process.cwd(), `./easy-service-config/.env`);
 
     if (!fs.existsSync(configPath)) {
       logError('please make sure the env file exist in the execute path!')
@@ -267,7 +266,6 @@ export default async ({ workDir }: { workDir: string }) => {
     logInfo(`local swagger config: ${config}`);
 
     const swagger = await require(config.ROOT_PATH+'/easy-service/swagger.json');
-
 
     if (keys(swagger?.paths)?.length) {
       // search all files with suffix of '-api.ts' in target work directory, and handle the target file

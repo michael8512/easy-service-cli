@@ -1,17 +1,21 @@
 import jsonServer from 'json-server';
 import getMockData from './mock';
-import localApiRouter from '../config/local-api-router'; // data from local router file
 import { keys, forEach }  from 'lodash';
 import * as http from 'http';
 import path from 'path';
 import mockGenerator from './mock-generator';
 import mockSwagger from './mock-swagger';
-import { logInfo, logSuccess } from './util/log';
+import { logInfo, logSuccess, logError } from './util/log';
+import fs from 'fs';
+import dotenv from 'dotenv';
+
 export interface ConfigProps {
-  projectRootPath?: string;
-  linkFiles: Array<{
-    url: string;
-  }>
+  MOCK_PORT: number;
+  SERVICE_REG: RegExp;
+  REG_API: RegExp;
+  ROOT_PATH: string;
+  SERVICES_PATH: string;
+  API_URL: string
 }
 
 const port = process.env.MOCK_PORT;
@@ -22,15 +26,25 @@ const routes = {};
 
 const initServer = async () => {
   const workDir = process.cwd();
-  const config: ConfigProps = await require(path.join(workDir, './config/config.json'));
+
+  const configPath = path.resolve(process.cwd(), `./easy-service-config/.env`);
+
+  if (!fs.existsSync(configPath)) {
+    logError('please execute in your root path!')
+    process.exit(1);
+  }
+
+  const config: ConfigProps = dotenv.config({ path: configPath }).parsed as any;
+
   logInfo(`local swagger config: ${JSON.stringify(config, null, 2)}`);
 
   // data from auto generated
-  const execPath = config?.projectRootPath ? path.resolve(process.cwd(), config.projectRootPath) : null;
-  const autoGeneratorRouter = execPath ? await mockGenerator(execPath) : {};
+  const autoGeneratorRouter = config?.ROOT_PATH ? await mockGenerator(config.ROOT_PATH) : {};
 
   // data from static swagger file
-  const { swaggerRouter, swagger } = await mockSwagger(path.join(workDir, './config/swagger'));
+  const { swaggerRouter, swagger } = await mockSwagger(path.join(workDir, './easy-service-config/swagger'));
+
+  const localApiRouter = fs.readFileSync(path.join(workDir, './easy-service-config/local-api-router')) || {};
 
   const routerData = { ...swaggerRouter, ...autoGeneratorRouter, ...localApiRouter };
 
