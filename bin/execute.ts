@@ -3,12 +3,20 @@ import inquirer from 'inquirer';
 import startMockServer from '../lib/mock-server';
 import download from '../lib/swagger-download';
 import generateService from '../lib/service-generator';
+import setup from '../lib/setup';
 
 const program = new Command();
 
 inquirer.registerPrompt('directory', require('inquirer-select-directory'));
 
 program.version(`easy-service/cli ${require('../package').version}`).usage('<command> [options]');
+
+program
+  .command('init')
+  .description('setup')
+  .action(async () => {
+    setup();
+  });
 
 program
   .command('download')

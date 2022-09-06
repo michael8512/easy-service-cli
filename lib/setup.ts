@@ -62,4 +62,4 @@ const setup = ()=> {
 
 }
 
-setup();
+export default setup;
