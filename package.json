@@ -1,19 +1,17 @@
 {
-  "name": "@easy-service/cli",
+  "name": "easy-service-cli",
   "version": "1.1.1",
   "description": "cli of mock and generate service",
   "bin": {
-    "easy-service": "dist/bin/execute.ts"
+    "easy-service": "dist/bin/easy-service.ts"
   },
   "scripts": {
-    "setup": "ts-node --project ./tsconfig.json  ./lib/setup.ts",
-    "mock": "nodemon -e ts,tsx --exec cross-env MOCK_PORT=7001 --max_old_space_size=8192 ts-node --project ./tsconfig.json  ./lib/mock-server.ts",
-    "download": "ts-node --project ./tsconfig.json  ./lib/swagger-download.ts",
+    "start": "ts-node bin/easy-service.ts",
     "build": "rm -rf ./dist && tsc --version && tsc --project .",
-    "local": "pnpm run build && local-package-publisher -p",
+    "local": "npm run build && local-package-publisher -p",
     "remove-local": "local-package-publisher -u",
-    "pub": "pnpm run build && npm version patch && npm publish",
-    "pub-release": "pnpm run build && pnpm version minor && pnpm publish"
+    "pub": "npm run build && npm version patch && npm publish",
+    "pub-release": "npm run build && npm version minor && npm publish"
   },
   "repository": {
     "type": "git",
