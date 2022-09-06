@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { Command } from 'commander';
 import inquirer from 'inquirer';
 import startMockServer from '../lib/mock-server';
@@ -9,7 +11,7 @@ const program = new Command();
 
 inquirer.registerPrompt('directory', require('inquirer-select-directory'));
 
-program.version(`easy-service/cli ${require('../package').version}`).usage('<command> [options]');
+program.version(`easy-service-cli ${require('../package').version}`).usage('<command> [options]');
 
 program
   .command('init')
