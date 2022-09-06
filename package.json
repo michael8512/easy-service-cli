@@ -15,9 +15,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/michael8512/easy-service.git"
+    "url": "https://github.com/michael8512/easy-service-cli.git"
   },
-  "homepage": "https://github.com/michael8512/easy-service/blob/master/README.md",
+  "homepage": "https://github.com/michael8512/easy-service-cli/blob/master/README.md",
   "keywords": [
     "mock",
     "cli",
