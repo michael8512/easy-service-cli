@@ -18,13 +18,12 @@ export interface ConfigProps {
   API_URL: string
 }
 
-const port = process.env.MOCK_PORT;
 const server = jsonServer.create();
 
 const data = {};
 const routes = {};
 
-const initServer = async () => {
+const initServer = async ({ serverPort }: { serverPort: number }) => {
   const workDir = process.cwd();
 
   const configPath = path.resolve(process.cwd(), `./easy-service-config/.env`);
@@ -77,10 +76,12 @@ const initServer = async () => {
   
   server.use(rewriter); // rewrite before router config
   server.use(router);
+
+  const port = serverPort || config.MOCK_PORT || 7001;
   
   server.listen(port, () => {
     logSuccess(`open mock server at localhost:${ port}`);
   });
 }
 
-initServer();
+export default initServer;

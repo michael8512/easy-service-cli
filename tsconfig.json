@@ -34,6 +34,6 @@
     "removeComments": true,
   },
   "exclude": ["node_modules"],
-  "include": ["./lib/**/*.ts", "config/local-api-router.ts"]
+  "include": ["./lib/**/*.ts"]
 }
   

@@ -251,9 +251,8 @@ export const ${apiName} = apiCreator<(p: ${pType}) => ${bType}>(apis.${apiName})
 };
 
 
-export default async ({ workDir }: { workDir: string }) => {
+export default async () => {
   try {
-
     const configPath = path.resolve(process.cwd(), `./easy-service-config/.env`);
 
     if (!fs.existsSync(configPath)) {
