@@ -21,10 +21,13 @@
   },
   "homepage": "https://github.com/michael8512/easy-service/blob/master/README.md",
   "keywords": [
-    "fast data"
+    "mock",
+    "cli",
+    "api",
+    "service"
   ],
   "author": "michael8512",
-  "license": "ISC",
+  "license": "AGPL",
   "dependencies": {
     "axios": "^0.21.1",
     "chalk": "^4.1.2",
@@ -63,13 +66,5 @@
     "ts-import-plugin": "^1.6.7",
     "ts-jest": "^26.5.4",
     "ts-loader": "^8.1.0"
-  },
-  "browserslist": [
-    "last 2 versions",
-    "Firefox ESR",
-    "> 1%",
-    "ie >= 8",
-    "iOS >= 8",
-    "Android >= 4"
-  ]
+  }
 }

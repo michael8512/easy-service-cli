@@ -79,7 +79,7 @@ const getCustomDataTypeData = (data: string)=> {
     return getCustomSimpleTypeData({type: data});
   } else {
     const tempData = data.replace(/{|}|\s/g, '').split(';')
-    const res = {};
+    const res = {} as any;
     forEach(tempData, item=> {
       const [propertyName, propertyType] = item.split(':');
       const value  = getCustomSimpleTypeData({type: propertyType, propertyName});
@@ -166,7 +166,7 @@ export default (props: {
           value = _getMockData(props, fullData);
           break;
         default:
-          const data = {};
+          const data = {} as any;
           for (const key in properties) {
             const pData = properties[key] as JSONSchema7;
             data[key] = _getBasicTypeData({ ...pData, propertyName: key, fullData });

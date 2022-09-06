@@ -31,7 +31,7 @@ import { logSuccess, logError, logInfo } from './util/log';
 import { walker } from './util/file-walker';
 import { forEach, keys } from 'lodash';
 
-const mockApiRes = {};
+const mockApiRes = {} as any;
 
 const REG_SEARCH = /(apiCreator)/g;
 

@@ -9,7 +9,7 @@ const ALL_CONTENT = ['responses', '200', 'content', '*/*', 'schema'];
 export default async (workDir: string) => {
   try {
     let schemas = {};
-    let apiMap = {};
+    let apiMap = {} as any;
 
     await new Promise<void>((resolve) => {
       walker({

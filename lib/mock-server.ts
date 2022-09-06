@@ -20,8 +20,8 @@ export interface ConfigProps {
 
 const server = jsonServer.create();
 
-const data = {};
-const routes = {};
+const data = {} as any;
+const routes: { [p: string]: string } = {};
 
 const initServer = async ({ serverPort }: { serverPort: number }) => {
   const workDir = process.cwd();
