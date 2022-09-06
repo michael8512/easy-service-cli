@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "cli of mock and generate service",
   "bin": {
-    "easy-service": "dist/bin/easy-service.ts"
+    "easy-service": "dist/bin/easy-service.js"
   },
   "scripts": {
     "start": "ts-node bin/easy-service.ts",
