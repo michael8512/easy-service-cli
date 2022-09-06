@@ -10,7 +10,7 @@ const program = new Command();
 
 inquirer.registerPrompt('directory', require('inquirer-select-directory'));
 
-program.version(`easy-service-cli ${require('../package').version}`).usage('<command> [options]');
+program.version(`easy-service-cli ${require('../../package').version}`).usage('<command> [options]');
 
 program
   .command('init')
@@ -37,7 +37,7 @@ program
   .command('generate-service')
   .description('generate service by API swagger')
   .action(async () => {
-    const workDir = process.cwd()
+    const workDir = process.cwd();
     generateService(workDir);
   });
 
