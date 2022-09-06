@@ -1,21 +1,21 @@
 {
   "name": "easy-service-cli",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "cli of mock and generate service",
   "bin": {
     "easy-service": "dist/bin/easy-service.js"
   },
   "scripts": {
-    "start": "ts-node bin/easy-service.ts",
+    "start": "node bin/easy-service.js",
     "build": "rm -rf ./dist && tsc --version && tsc --project .",
     "local": "npm run build && local-package-publisher -p",
     "remove-local": "local-package-publisher -u",
-    "pub": "npm run build && npm publish",
+    "pub": "npm run build && npm version patch && npm publish",
     "pub-release": "npm run build && npm version minor && npm publish"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/michael8512/easy-service-cli.git"
+    "url": "git+https://github.com/michael8512/easy-service-cli.git"
   },
   "homepage": "https://github.com/michael8512/easy-service-cli/blob/master/README.md",
   "keywords": [
@@ -27,21 +27,16 @@
   "author": "michael8512",
   "license": "AGPL",
   "dependencies": {
-    "axios": "^0.21.1",
     "chalk": "^4.1.2",
     "commander": "^8.1.0",
     "dotenv": "^16.0.2",
     "fs": "0.0.1-security",
-    "immer": "^9.0.1",
     "inquirer": "^8.0.0",
     "inquirer-select-directory": "^1.2.0",
-    "js-base64": "^3.6.1",
     "json-server": "^0.16.3",
     "lodash": "^4.17.21",
     "mockjs": "^1.1.0",
-    "moment": "^2.29.1",
     "node-fetch": "^2.6.1",
-    "superagent": "^6.1.0",
     "ts-json-schema-generator": "^0.93.0",
     "ts-node": "^10.9.1",
     "tslib": "^2.2.0",
@@ -64,5 +59,10 @@
     "ts-import-plugin": "^1.6.7",
     "ts-jest": "^26.5.4",
     "ts-loader": "^8.1.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    }
   }
 }

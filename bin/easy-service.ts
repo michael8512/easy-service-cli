@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 import { Command } from 'commander';
 import inquirer from 'inquirer';
 import startMockServer from '../lib/mock-server';
