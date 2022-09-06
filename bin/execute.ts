@@ -8,7 +8,7 @@ const program = new Command();
 
 inquirer.registerPrompt('directory', require('inquirer-select-directory'));
 
-program.version(`api/easy-service ${require('../package').version}`).usage('<command> [options]');
+program.version(`easy-service/cli ${require('../package').version}`).usage('<command> [options]');
 
 program
   .command('download')

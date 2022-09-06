@@ -1,9 +1,9 @@
 {
-  "name": "@api/easy-service",
+  "name": "@easy-service/cli",
   "version": "1.0.0",
   "description": "cli of mock and generate service",
   "bin": {
-    "easy-service": "dist/bin/easy-service.js"
+    "easy-service": "dist/bin/execute.ts"
   },
   "scripts": {
     "setup": "ts-node --project ./tsconfig.json  ./lib/setup.ts",
