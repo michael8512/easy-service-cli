@@ -1,6 +1,6 @@
 {
   "name": "easy-service-cli",
-  "version": "1.1.0",
+  "version": "3.0.0",
   "description": "cli of mock and generate service",
   "bin": {
     "easy-service": "dist/bin/easy-service.ts"
@@ -10,7 +10,7 @@
     "build": "rm -rf ./dist && tsc --version && tsc --project .",
     "local": "npm run build && local-package-publisher -p",
     "remove-local": "local-package-publisher -u",
-    "pub": "npm run build && npm version patch && npm publish",
+    "pub": "npm run build && npm publish",
     "pub-release": "npm run build && npm version minor && npm publish"
   },
   "repository": {
