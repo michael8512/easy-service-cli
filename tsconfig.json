@@ -1,35 +1,28 @@
 {
   "compilerOptions": {
-    "target": "es6",                          /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017','ES2018' or 'ESNEXT'. */
-    "module": "commonjs",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
-    "lib": ["es6", "es2020", "esnext.asynciterable"],                           /* Specify library files to be included in the compilation. */
-    "sourceMap": false,                     /* Generates corresponding '.map' file. */
-    "incremental": true,
-    /* Strict Type-Checking Options */
-    "strict": false,                           /* Enable all strict type-checking options. */
-    "noImplicitAny": true,                 /* Raise error on expressions and declarations with an implied 'any' type. */
-    "strictNullChecks": true,              /* Enable strict null checks. */
-    "strictFunctionTypes": true,           /* Enable strict checking of function types. */
-    "noUnusedLocals": true,                /* Report errors on unused locals. */
-    "noUnusedParameters": true,            /* Report errors on unused parameters. */
-    "noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
-    "noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
-    "moduleResolution": "node",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
-    "importHelpers": false,              
-    // "typeRoots": [],                       /* List of folders to include type definitions from. */
-    "allowSyntheticDefaultImports": true,  /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
-    "esModuleInterop": true,                   /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports.
-    /* Experimental Options */
-    "experimentalDecorators": true,        /* Enables experimental support for ES7 decorators. */
-    "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
-    "suppressImplicitAnyIndexErrors": true,
-    "skipLibCheck": true,
+    "target": "es6",
+    "module": "commonjs",
+    "lib": ["es6", "es2020", "esnext.asynciterable"],
+    "sourceMap": false,
     "outDir": "./dist",
-    "baseUrl": ".",
+    "moduleResolution": "node",
     "removeComments": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "resolveJsonModule": true,
+    "baseUrl": ".",
+    "skipLibCheck": true
   },
   "exclude": ["node_modules"],
-  "include": ["./lib/**/*.ts", "./bin/*.ts"]
+  "include": ["./lib/**/*.ts", "./bin/**/*.ts"]
 }
-  
