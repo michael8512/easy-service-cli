@@ -24,12 +24,15 @@ const data = {} as any;
 const routes: { [p: string]: string } = {};
 
 const initServer = async ({ serverPort }: { serverPort: number }) => {
-  const workDir = process.cwd();
-
+  if (!fs.existsSync(path.resolve(process.cwd(), `./package.json`))) {
+    logError('please execute in your root path!')
+    process.exit(1);
+  }
+  
   const configPath = path.resolve(process.cwd(), `./easy-service-config/.env`);
 
   if (!fs.existsSync(configPath)) {
-    logError('please execute in your root path!')
+    logError('please setup first by executing "easy-service init"!')
     process.exit(1);
   }
 
@@ -38,12 +41,12 @@ const initServer = async ({ serverPort }: { serverPort: number }) => {
   logInfo(`local swagger config: ${JSON.stringify(config, null, 2)}`);
 
   // data from auto generated
-  const autoGeneratorRouter = config?.ROOT_PATH ? await mockGenerator(config.ROOT_PATH) : {};
+  const autoGeneratorRouter = config?.ROOT_PATH ? await mockGenerator(config.SERVICES_PATH) : {};
 
   // data from static swagger file
-  const { swaggerRouter, swagger } = await mockSwagger(path.join(workDir, './easy-service-config/swagger'));
+  const { swaggerRouter, swagger } = await mockSwagger(path.join(config.ROOT_PATH, './easy-service-config/swagger'));
 
-  const localApiRouter = fs.readFileSync(path.join(workDir, './easy-service-config/local-api-router')) || {};
+  const localApiRouter = fs.readFileSync(path.join(config.ROOT_PATH, './easy-service-config/local-api-router.ts')) || {};
 
   const routerData = { ...swaggerRouter, ...autoGeneratorRouter, ...localApiRouter };
 

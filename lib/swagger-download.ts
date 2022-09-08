@@ -14,7 +14,7 @@ const startDowLoad = async (config: ConfigProps) => {
       return res.json();
     }).then(data => {
       const title = data?.info?.title || 'swagger';
-      const _path = path.resolve(process.cwd(), `./${config.ROOT_PATH}/easy-service-config/swagger/${title}.json`);
+      const _path = path.resolve(config.ROOT_PATH, `./easy-service-config/swagger/${title}.json`);
       logInfo(`download swagger:【${title}.json】`);
       fs.writeFileSync(_path, JSON.stringify(data), 'utf8');
       resolve();
@@ -26,13 +26,18 @@ const startDowLoad = async (config: ConfigProps) => {
 
 const clearSwaggerFiles = (rootPath: string) => {
   execSync(`rm -rf ${path.join(rootPath, './easy-service-config/swagger')}`);
-  fs.mkdirSync(path.join(process.cwd(), './easy-service-config/swagger'));
+  fs.mkdirSync(path.join(rootPath, './easy-service-config/swagger'));
 }
 const updateSwaggerFiles = async ()=> {
+  if (!fs.existsSync(path.resolve(process.cwd(), `./package.json`))) {
+    logError('please execute in your root path!')
+    process.exit(1);
+  }
+  
   const configPath = path.resolve(process.cwd(), `./easy-service-config/.env`);
 
   if (!fs.existsSync(configPath)) {
-    logError('please execute "npm run setup" first!')
+    logError('please setup first by executing "easy-service init"!')
     process.exit(1);
   }
 
