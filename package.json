@@ -53,8 +53,6 @@
     "ignore-loader": "^0.1.2",
     "local-package-publisher": "^1.0.4",
     "node-notifier": "^9.0.1",
-    "nodemon": "^2.0.7",
-    "ts-auto-i18n-plugin": "0.0.15",
     "ts-import-plugin": "^1.6.7",
     "ts-jest": "^26.5.4",
     "ts-loader": "^8.1.0"
