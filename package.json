@@ -29,7 +29,6 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "commander": "^8.1.0",
-    "dotenv": "^16.0.2",
     "fs": "0.0.1-security",
     "inquirer": "^8.0.0",
     "inquirer-select-directory": "^1.2.0",

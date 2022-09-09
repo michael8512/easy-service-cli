@@ -7,7 +7,7 @@ cli of mock and generate service
 
 ## Usage
 
-#### install dependency & initialize .env config
+#### install dependency & initialize config.ts
 
 > easy-service init
 ```ts
@@ -30,7 +30,7 @@ export const config = {
 };
 ```
 
-#### download api swagger based on API_URL from .env
+#### download api swagger based on API_URL from config.ts
 
 > easy-service download
 
@@ -38,6 +38,6 @@ export const config = {
 
 > easy-service generate-service [workDir]
 
-#### start mock server based on MORK_PORT form .env
+#### start mock server based on MORK_PORT form config.ts
 
 > easy-service mock
