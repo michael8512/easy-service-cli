@@ -10,7 +10,7 @@ import fs from 'fs';
 
 export interface ConfigProps {
   MOCK_PORT: number;
-  SERVICE_REG: RegExp;
+  REG_SERVICE: RegExp;
   REG_API: RegExp;
   ROOT_PATH: string;
   SERVICES_PATH: string;

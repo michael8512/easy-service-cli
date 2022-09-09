@@ -4,7 +4,7 @@ export const config = {
   ROOT_PATH: "",
   SERVICES_PATH: "",
   API_URL: "",
-  SERVICE_REG: "",
+  REG_SERVICE: "",
   REG_API: "",
   REG_SYMBOL: "",
   getApiInfoByReg: (regRes: any) => {

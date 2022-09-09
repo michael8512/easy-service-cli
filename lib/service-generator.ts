@@ -109,7 +109,7 @@ const autoGenerateService = (
   isEnd: boolean,
   swaggerData: SwaggerData,
   config: { 
-    SERVICE_REG: RegExp; 
+    REG_SERVICE: RegExp; 
     REG_SYMBOL: RegExp;
     getApiInfoByReg: (res: any) => { apiName: string, method: string, apiPath: string };
     getOutputServiceByTemplate: (res: { apiName: string, paramsT: string, resT: string }) => string;
@@ -127,7 +127,7 @@ const autoGenerateService = (
       fs.existsSync(typeFilePath) ? fs.readFileSync(typeFilePath, 'utf8') : '',
     );
 
-    let regRes = config.SERVICE_REG.exec(content);
+    let regRes = config.REG_SERVICE.exec(content);
 
     while (regRes) {
       const { apiName, method, apiPath: _apiPath } = config.getApiInfoByReg(regRes);
@@ -205,7 +205,7 @@ interface ${key} ${formatJson(dMap[key])}`
       });
 
       // continue to execute
-      regRes = config.SERVICE_REG.exec(content);
+      regRes = config.REG_SERVICE.exec(content);
     }
 
     forEach(apiList, ({ apiName, parameters, resData, resType }) => {
