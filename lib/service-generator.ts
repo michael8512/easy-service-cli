@@ -18,7 +18,6 @@ interface ApiItem {
   resType: string;
   parameters: string;
   resData: string;
-  componentList?: any[];
 }
 
 interface SwaggerData {
@@ -122,7 +121,7 @@ const autoGenerateService = (
     const apiList: ApiItem[] = [];
 
     let serviceContent = getSteadyContent(filePath, content);
-    const typeFilePath = filePath.replace(/\/services2\//, '/types/').replace(/\.ts/, '.d.ts');
+    const typeFilePath = filePath.replace(/\/services\//, '/types/').replace(/\.ts/, '.d.ts');
     let typeContent = getSteadyContent(
       typeFilePath,
       fs.existsSync(typeFilePath) ? fs.readFileSync(typeFilePath, 'utf8') : '',
@@ -252,8 +251,41 @@ ${config.getOutputServiceByTemplate({apiName, paramsT: pType, resT: bType})}
   }
 };
 
+const getSwagger = async (filePath: string)=> {
+  try {
+    let paths = {};
+    let components = {} as any;
 
-const autoGenerate = async (workDir: string) => {
+    await new Promise<void>((resolve) => {
+      walker({
+        root: filePath,
+        dealFile: async (_content: string, filePath: string, isEnd: boolean, isEmpty?: boolean) => {
+          if (isEmpty) {
+            resolve();
+            return;
+          }
+
+          const data = await require(filePath);
+
+          paths = {...paths, ...data.paths }
+          components = {...components, ...data.components }
+
+          if (isEnd) {
+            logSuccess('get swagger data successfully, bye 👋');
+            resolve();
+          }
+        },
+      });
+    });
+    
+    return { paths, components };
+  } catch (error) {
+    logError(error);
+    return error;
+  }
+}
+
+const autoGenerate= async (workDir: string) => {
   try {
     const configPath = path.resolve(workDir, `./easy-service-config/config.ts`);
 
@@ -262,16 +294,14 @@ const autoGenerate = async (workDir: string) => {
       process.exit(1);
     }
 
-    // const { parsed: config } = dotenv.config({ path: configPath }) as any;
     const { config } = await require(configPath)
     
     logInfo(`local swagger config: ${JSON.stringify(config)}`);
     
-    const swagger = await require(workDir+'/easy-service-config/swagger/swagger.json');
-    // const swagger = await require(config.ROOT_PATH+'/easy-service/swagger.json');
+    const swagger = await getSwagger(workDir+'/easy-service-config/swagger');
 
     if (keys(swagger?.paths)?.length) {
-      // search all files with suffix of '-api.ts' in target work directory, and handle the target file
+      // search all files with suffix of '.ts' in target services directory, and handle the target file
       await new Promise<void>((resolve) => {
         walker({
           root: config.SERVICES_PATH,
