@@ -4,10 +4,9 @@ import { logSuccess, logInfo, logError } from './util/log';
 import { walker } from './util/file-walker';
 import { get, forEach, keys } from 'lodash';
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
-import { EOL } from 'os';
-import dotenv from 'dotenv';
+import { formatApiPath, formatJson, getSteadyContent, NUMBER_TYPES } from './util/helper';
 
-type ParamsType = 'query' | 'body' | 'path';
+type ParamsType = 'query' | 'body' | 'path' | 'header';
 
 interface JSONSchema extends Omit<JSONSchema7, 'type'> {
   type: JSONSchema7TypeName | 'integer' | 'float' | 'double' | 'long';
@@ -19,6 +18,7 @@ interface ApiItem {
   resType: string;
   parameters: string;
   resData: string;
+  componentList?: any[];
 }
 
 interface SwaggerData {
@@ -32,100 +32,76 @@ interface SwaggerData {
   };
 }
 
-const NUMBER_TYPES = ['integer', 'float', 'double', 'number', 'long'];
+const getResData: any = (swaggerData: SwaggerData) => {
+  const componentMap: { [p: string]: any } = {}
+  
+  const getBaseData: any = (props: JSONSchema & { propertyName?: string }) => {
+    const { type, properties = {}, items, required = [] } = props || {};
+    let value;
+  
+    if (type === 'object') {
+      const data: { [p: string]: string | object } = {};
+      // eslint-disable-next-line guard-for-in
+      if (Object.keys(properties).length === 0) {
+        value = 'object'
+      } else {
+        for (const key in properties) {
+          const pData = properties[key] as JSONSchema;
+          const __key = required.includes(key) ? key : `${key}?`;
+          data[__key] = getBaseData({ ...pData, propertyName: key });
+        }
+        value = data;
+      }
+    } else if (type === 'array' && items) {
+      const itemsType = getResponseType(items, swaggerData);
+  
+      if (itemsType === 'array' || itemsType === 'object') {
+        const componentName = get(items, '$ref')?.split('/').slice(-1)[0];
+        const componentContent = getSchemaData(items as any)[0];
+        value = componentName ? `${componentName}[]` : `Array<${formatJson(componentContent)}>`;
 
-const formatJson = (data: string | object) => {
-  const jsonData = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
-  return jsonData.replace(/\\+n/g, '\n').replace(/"/g, '');
-};
-
-const formatApiPath = (apiPath: string) => {
-  const pathParams: { [p: string]: string } = {};
-  const newApiPath = apiPath.replace(/(:[a-zA-Z]+)/g, (p: string) => {
-    const pName = p.slice(1);
-    pathParams[pName] = pName.toLocaleLowerCase().includes('id') ? 'number' : 'string';
-    return `<${pName}>`;
-  });
-  return {
-    url: newApiPath,
-    pathParams,
+        if (value === 'Array<object>') {
+          value = 'object[]'
+        }
+      } else {
+        value = `${itemsType}[]`;
+      }
+    } else if (NUMBER_TYPES.includes(type)) {
+      value = 'number';
+    } else {
+      value = type;
+    }
+    return value;
   };
-};
 
-const getSteadyContent = (filePath: string, content?: string) => {
-  if (!fs.existsSync(filePath) || !content) {
-    return `
-
-// > AUTO GENERATED
-`;
-  } else if (!content.includes('GENERATED')) {
-    return `${content}
-// > AUTO GENERATED  
-`;
-  } else {
-    const lastIndex = content.indexOf('GENERATED');
-    const steadyContent = lastIndex ? content.slice(0, lastIndex + 9) : content;
-
-    return `${steadyContent}${EOL}`;
-  }
-};
-
-const getBasicTypeData = (props: JSONSchema & { propertyName?: string }, swaggerData: SwaggerData) => {
-  const { type, properties = {}, items, required = [] } = props || {};
-  let value;
-
-  if (type === 'object') {
-    const data: { [p: string]: string | object } = {};
-    // eslint-disable-next-line guard-for-in
-    for (const key in properties) {
-      const pData = properties[key] as JSONSchema;
-      const __key = required.includes(key) ? key : `${key}?`;
-      data[__key] = getBasicTypeData({ ...pData, propertyName: key }, swaggerData);
-    }
-    value = data;
-  } else if (type === 'array' && items) {
-    const itemsType = get(items, 'type');
-    if (itemsType === 'object' || itemsType === 'array') {
-      value = `Array<${formatJson(getSchemaData(items, swaggerData))}>`;
+  const getSchemaData: any = (schemaData: JSONSchema)=> {
+    const { $ref, type } = schemaData || {};
+    let res;
+    if ($ref) {
+      const componentName = $ref.split('/').slice(-1)[0]
+      res = componentName;
+      if (!componentMap[componentName]) {
+        componentMap[componentName] = getSchemaData(get(swaggerData, $ref.split('/').slice(1)))[0];
+      }
+    } else if (type) {
+      res = getBaseData(schemaData);
     } else {
-      value = `${itemsType}[]`;
+      res = schemaData;
     }
-  } else if (type === 'integer' || type === 'number') {
-    value = 'number';
-  } else {
-    value = type;
+
+    return [res || {}, componentMap];
   }
-  return value;
+
+  return getSchemaData;
 };
 
-const getSchemaData: any = (schemaData: JSONSchema, swaggerData: SwaggerData) => {
-  const { $ref, type } = schemaData || {};
-  let res;
-  if ($ref) {
-    const quoteList = $ref.split('/').slice(1);
-    res = getSchemaData(get(swaggerData, quoteList), swaggerData);
-  } else if (type) {
-    res = getBasicTypeData(schemaData, swaggerData);
-  } else {
-    res = schemaData;
-  }
-  return res || {};
-};
-
-const getResponseType = (schemaData: JSONSchema, swaggerData: SwaggerData) => {
-  const { $ref } = schemaData || {};
-  if ($ref) {
-    const quoteList = $ref.split('/').slice(1);
-    const _data = get(swaggerData, [...quoteList, 'properties', 'data']) || {};
-
-    if (_data.type === 'object' && _data.properties?.total && _data.properties?.list) {
-      return 'pagingList';
-    } else {
-      return _data.type;
-    }
-  } else {
-    return schemaData?.type;
-  }
+const getResponseType: any = (schemaData: JSONSchema, swaggerData: SwaggerData) => {
+  const { $ref = '', type } = schemaData || {};
+  return type
+    ? type
+    : $ref
+      ? getResponseType(get(swaggerData, $ref.split('/').slice(1)) || {}, swaggerData)
+      : null
 };
 
 const autoGenerateService = (
@@ -134,25 +110,28 @@ const autoGenerateService = (
   isEnd: boolean,
   swaggerData: SwaggerData,
   config: { 
-    REG_SEARCH: RegExp; 
-    REG_API: RegExp;
+    SERVICE_REG: RegExp; 
+    REG_SYMBOL: RegExp;
+    getApiInfoByReg: (res: any) => { apiName: string, method: string, apiPath: string };
+    getOutputServiceByTemplate: (res: { apiName: string, paramsT: string, resT: string }) => string;
   },
   resolve: (value: void | PromiseLike<void>) => void,
 ) => {
-  if (content.match(config.REG_SEARCH)) {
+  if (content.match(config.REG_SYMBOL)) {
+
     const apiList: ApiItem[] = [];
 
     let serviceContent = getSteadyContent(filePath, content);
-    const typeFilePath = filePath.replace(/\/services\//, '/types/').replace(/-api\.ts/, '.d.ts');
+    const typeFilePath = filePath.replace(/\/services2\//, '/types/').replace(/\.ts/, '.d.ts');
     let typeContent = getSteadyContent(
       typeFilePath,
       fs.existsSync(typeFilePath) ? fs.readFileSync(typeFilePath, 'utf8') : '',
     );
 
-    let regRes = config.REG_API.exec(content);
+    let regRes = config.SERVICE_REG.exec(content);
 
     while (regRes) {
-      const [, apiName, method, _apiPath] = regRes;
+      const { apiName, method, apiPath: _apiPath } = config.getApiInfoByReg(regRes);
 
       const { url: apiPath, pathParams } = formatApiPath(_apiPath);
       // get params from api path
@@ -174,35 +153,49 @@ const autoGenerateService = (
           schema: JSONSchema;
           required?: boolean;
         }) => {
+          type = type ?? getResponseType(schema);
           if (paramsIn === 'query') {
             parameters[`${name}${required ? '' : '?'}`] = NUMBER_TYPES.includes(type) ? 'number' : type;
           } else if (paramsIn === 'path') {
             parameters[name] = NUMBER_TYPES.includes(type) ? 'number' : type;
-          } else {
-            parameters = {
-              ...parameters,
-              ...(getSchemaData(schema) || {}),
-            };
+          } else if (paramsIn !== 'header') {
+            const getDataBySchema = getResData(swaggerData)
+            const tempType = getDataBySchema(schema);
+
+            if (typeof tempType === 'string') {
+              parameters[name] = tempType;
+            } else {
+              parameters = {
+                ...parameters,
+                ...(tempType || {}),
+              };
+            }
           }
         },
       );
 
-      const _schemaData = get(swaggerData, ['paths', apiPath, method, 'responses', '200', 'schema']);
+      const _schemaData = get(swaggerData, ['paths', apiPath, method, 'responses', '200', 'content', 'application/json', 'schema']);
 
       const resType = getResponseType(_schemaData, swaggerData);
-      const fullData = getSchemaData(_schemaData, swaggerData) || {};
 
-      const responseData =
-        resType === 'pagingList'
-          ? fullData.data?.list || get(fullData, ['data?', 'list?'])
-          : fullData.data || fullData['data?'] || {};
+      const getDataBySchema = getResData(swaggerData)
+      const [fullData, dMap] = getDataBySchema(_schemaData) || {};
 
-      const _resData: string = JSON.stringify(responseData, null, 2);
-      let resData = formatJson(_resData);
+      const responseData = fullData.data || fullData['data?'] || dMap[fullData] || fullData;
 
-      if (_resData.startsWith('"Array<')) {
-        resData = formatJson(_resData.slice(7, _resData.length - 2));
+      const _resData: string = responseData ? JSON.stringify(responseData, null, 2) : 'void';
+      let resData = responseData ? formatJson(_resData) : 'void';
+
+      for (let key in dMap) {
+        if (key !== fullData) {
+          resData += `\r\n
+interface ${key} ${formatJson(dMap[key])}`
+        }
       }
+
+      // if (_resData.startsWith('"Array<')) {
+      //   resData = formatJson(_resData.slice(7, _resData.length - 2));
+      // }
 
       apiList.push({
         apiName,
@@ -211,13 +204,18 @@ const autoGenerateService = (
         resData,
         resType,
       });
-      regRes = config.REG_API.exec(content);
+
+      // continue to execute
+      regRes = config.SERVICE_REG.exec(content);
     }
 
     forEach(apiList, ({ apiName, parameters, resData, resType }) => {
       let pType = '{}';
-      let bType = 'RAW_RESPONSE';
-      if (resData !== '{}') {
+      let bType = 'void';
+
+      if (['string', 'number', 'boolean'].includes(resData)) {
+        bType = resData;
+      } else if (resData !== '{}') {
         if (resType === 'pagingList') {
           bType = `IPagingResp<T_${apiName}_item>`;
         } else if (resType === 'array') {
@@ -226,8 +224,13 @@ const autoGenerateService = (
           bType = `T_${apiName}_data`;
         }
 
-        typeContent += `
-interface T_${apiName}_${['array', 'pagingList'].includes(resType) ? 'item' : 'data'} ${resData}\n`;
+        if (resData !== 'void') {
+          typeContent += `
+interface T_${apiName}_data ${resData}\n`;
+        } else {
+          typeContent += `
+type T_${apiName}_data = ${resData}\n`;          
+        }
       }
       if (parameters !== '{}') {
         typeContent += `
@@ -236,14 +239,13 @@ interface T_${apiName}_params ${parameters}\n`;
       }
 
       serviceContent += `
-export const ${apiName} = apiCreator<(p: ${pType}) => ${bType}>(apis.${apiName});
+${config.getOutputServiceByTemplate({apiName, paramsT: pType, resT: bType})}
         `;
     });
 
     fs.writeFileSync(typeFilePath, typeContent, 'utf8');
     fs.writeFileSync(filePath, serviceContent, 'utf8');
   }
-
   if (isEnd) {
     logSuccess('service data is updated, bye 👋');
     resolve();
@@ -251,26 +253,28 @@ export const ${apiName} = apiCreator<(p: ${pType}) => ${bType}>(apis.${apiName})
 };
 
 
-export default async (workDir: string) => {
+const autoGenerate = async (workDir: string) => {
   try {
-    const configPath = path.resolve(workDir, `./easy-service-config/.env`);
+    const configPath = path.resolve(workDir, `./easy-service-config/config.ts`);
 
     if (!fs.existsSync(configPath)) {
       logError('please make sure the env file exist in the execute path!')
       process.exit(1);
     }
 
-    const { parsed: config } = dotenv.config({ path: configPath }) as any;
-
-    logInfo(`local swagger config: ${config}`);
-
-    const swagger = await require(config.ROOT_PATH+'/easy-service/swagger.json');
+    // const { parsed: config } = dotenv.config({ path: configPath }) as any;
+    const { config } = await require(configPath)
+    
+    logInfo(`local swagger config: ${JSON.stringify(config)}`);
+    
+    const swagger = await require(workDir+'/easy-service-config/swagger/swagger.json');
+    // const swagger = await require(config.ROOT_PATH+'/easy-service/swagger.json');
 
     if (keys(swagger?.paths)?.length) {
       // search all files with suffix of '-api.ts' in target work directory, and handle the target file
       await new Promise<void>((resolve) => {
         walker({
-          root: workDir,
+          root: config.SERVICES_PATH,
           dealFile: (...args) => {
             autoGenerateService.apply(null, [...args, swagger, config, resolve]);
           },
@@ -284,3 +288,5 @@ export default async (workDir: string) => {
     logError(error);
   }
 };
+
+export default autoGenerate;

@@ -2,7 +2,7 @@ import { join } from 'path'
 import fs from "fs";
 import { logError, logSuccess } from './util/log';
 import path from 'path';
-import envContent from '../templates/env-template';
+import configContent from '../templates/config-template';
 import localApiRouterContent from '../templates/local-api-router-template';
 
 const setup = ()=> {
@@ -18,7 +18,7 @@ const setup = ()=> {
   if (!fs.existsSync(configPath)) {
     fs.mkdirSync(join(configPath));
     fs.mkdirSync(join(configPath, './swagger'));
-    fs.writeFileSync(join(configPath,'./.env'), envContent, 'utf8');
+    fs.writeFileSync(join(configPath,'./config.ts'), configContent, 'utf8');
     fs.writeFileSync(join(configPath, './local-api-router.ts'), localApiRouterContent, 'utf8');
   }
 

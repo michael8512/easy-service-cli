@@ -4,7 +4,6 @@ import fs from "fs";
 import fetch from 'node-fetch';
 import { logError, logSuccess, logInfo } from './util/log';
 import { ConfigProps } from './mock-server'
-import dotenv from 'dotenv';
 
 const startDowLoad = async (config: ConfigProps) => {
   new Promise<void>((resolve)=> {
@@ -34,14 +33,14 @@ const updateSwaggerFiles = async ()=> {
     process.exit(1);
   }
   
-  const configPath = path.resolve(process.cwd(), `./easy-service-config/.env`);
+  const configPath = path.resolve(process.cwd(), `./easy-service-config/config.ts`);
 
   if (!fs.existsSync(configPath)) {
     logError('please setup first by executing "easy-service init"!')
     process.exit(1);
   }
 
-  const config: ConfigProps = dotenv.config({ path: configPath }).parsed as any;
+  const { config } = await require(configPath);
 
   clearSwaggerFiles(config.ROOT_PATH);
   startDowLoad(config);

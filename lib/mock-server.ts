@@ -7,7 +7,6 @@ import mockGenerator from './mock-generator';
 import mockSwagger from './mock-swagger';
 import { logInfo, logSuccess, logError } from './util/log';
 import fs from 'fs';
-import dotenv from 'dotenv';
 
 export interface ConfigProps {
   MOCK_PORT: number;
@@ -29,14 +28,14 @@ const initServer = async ({ serverPort }: { serverPort: number }) => {
     process.exit(1);
   }
   
-  const configPath = path.resolve(process.cwd(), `./easy-service-config/.env`);
+  const configPath = path.resolve(process.cwd(), `./easy-service-config/config.ts`);
 
   if (!fs.existsSync(configPath)) {
     logError('please setup first by executing "easy-service init"!')
     process.exit(1);
   }
 
-  const config: ConfigProps = dotenv.config({ path: configPath }).parsed as any;
+  const { config } = await require(configPath);
 
   logInfo(`local swagger config: ${JSON.stringify(config, null, 2)}`);
 
@@ -82,9 +81,7 @@ const initServer = async ({ serverPort }: { serverPort: number }) => {
 
   const port = serverPort || config.MOCK_PORT || 7001;
   
-  server.listen(port, () => {
-    logSuccess(`open mock server at localhost:${ port}`);
-  });
+  server.listen(port, () => logSuccess(`open mock server at localhost:${port}`));
 }
 
 export default initServer;
