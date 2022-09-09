@@ -1,5 +1,6 @@
 import { logError, logSuccess } from './util/log';
-import { forEach, keys, get } from 'lodash';
+import get from 'lodash/get';
+import forEach from 'lodash/forEach';
 import { walker } from './util/file-walker';
 
 const JSON_CONTENT = ['responses', '200', 'content', 'application/json', 'schema'];
@@ -23,13 +24,13 @@ export default async (workDir: string) => {
           const data = await require(filePath);
 
           const { paths } = data;
-          forEach(keys(paths), name => {
+          forEach(Object.keys(paths), name => {
             const apiData = paths[name];
             const apiName = name.replace(/[<|{|\u003c]([a-zA-Z]+)[>|}|\u003e]/g, (p)=> {
               const pName = p.slice(1, p.length-1)
               return `:${pName}`;
             });
-            forEach(keys(apiData), method=> {
+            forEach(Object.keys(apiData), method=> {
               const apiMethodData = apiData[method];
               const newApiPath = apiName.includes('api') ? apiName.replace(/\/api\//g, `/${method}/`) : `/${method}${apiName}`;
         

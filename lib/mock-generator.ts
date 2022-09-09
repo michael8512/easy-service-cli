@@ -29,7 +29,7 @@
 
 import { logSuccess, logError, logInfo } from './util/log';
 import { walker } from './util/file-walker';
-import { forEach, keys } from 'lodash';
+import forEach from 'lodash/forEach';
 
 const mockApiRes = {} as any;
 
@@ -106,7 +106,7 @@ const autoGenerateService = (
       typeRes = REG_TYPE.exec(content);
     }
 
-    forEach(keys(apiList), (apiName: string) => {
+    forEach(Object.keys(apiList), (apiName: string) => {
       const { url } = apiList[apiName];
       mockApiRes[url] = { ...apiList[apiName], url: undefined };
     });

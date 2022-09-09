@@ -2,9 +2,10 @@ import path from 'path';
 import fs from 'fs';
 import { logSuccess, logInfo, logError } from './util/log';
 import { walker } from './util/file-walker';
-import { get, forEach, keys } from 'lodash';
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
 import { formatApiPath, formatJson, getSteadyContent, NUMBER_TYPES } from './util/helper';
+import get from 'lodash/get';
+import forEach from 'lodash/get';
 
 type ParamsType = 'query' | 'body' | 'path' | 'header';
 
@@ -300,7 +301,7 @@ const autoGenerate= async (workDir: string) => {
     
     const swagger = await getSwagger(workDir+'/easy-service-config/swagger');
 
-    if (keys(swagger?.paths)?.length) {
+    if (Object.keys(swagger?.paths)?.length) {
       // search all files with suffix of '.ts' in target services directory, and handle the target file
       await new Promise<void>((resolve) => {
         walker({

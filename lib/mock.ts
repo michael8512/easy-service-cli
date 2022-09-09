@@ -1,5 +1,7 @@
 import Mock from 'mockjs';
-import { get, forEach, every } from 'lodash';
+import get from 'lodash/get';
+import forEach from 'lodash/forEach';
+import every from 'lodash/every';
 import * as tsj from 'ts-json-schema-generator';
 import { resolve } from 'path';
 import { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema'

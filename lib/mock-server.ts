@@ -1,6 +1,6 @@
 import jsonServer from 'json-server';
 import getMockData from './mock';
-import { keys, forEach }  from 'lodash';
+import forEach  from 'lodash/forEach';
 import * as http from 'http';
 import path from 'path';
 import mockGenerator from './mock-generator';
@@ -49,7 +49,7 @@ const initServer = async ({ serverPort }: { serverPort: number }) => {
 
   const routerData = { ...swaggerRouter, ...autoGeneratorRouter, ...localApiRouter };
 
-  forEach(keys(routerData), (url) => {
+  forEach(Object.keys(routerData), (url) => {
     const { name } = routerData[url];
     data[name] = {};
     routes[url] = `/${name}`;
