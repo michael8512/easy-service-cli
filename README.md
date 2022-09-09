@@ -41,3 +41,65 @@ export const config = {
 #### start mock server based on MORK_PORT form config.ts
 
 > easy-service mock
+```txt
+will mock data by 3 ways
+a) the api interface doc from easy-service-config/swagger/*
+b) the matched service by REG_API
+c) interface from local file of /easy-service-config/local-api.router.ts
+
+the priority will be c > b > a
+```
+
+#### how to use the mock tool in your application?
+> npm i axios-retry-adapter
+
+> package.json [for example]
+```json
+"rm -rf public && NODE_ENV=development MODE=DEV MOCK=TRUE node --trace-deprecation node_modules/webpack/bin/webpack.js --config ./webpack/webpack.config.js --progress --color -w",
+```
+
+> webpack-config.js 
+```ts
+
+const getMockPort = () => {
+  const { config } = dotenv.config({ path: path.resolve(process.cwd(), '../easy-service-config/config.ts') });
+  return config.MOCK_PORT;
+};
+...
+
+const mockPort = process.env.MOCK ? getMockPort() : '';
+
+...
+new webpack.DefinePlugin({
+  ...
+  'process.env.MOCK_PORT': JSON.stringify(mockPort),
+}),
+```
+
+> axios config 
+```ts
+import axios, { AxiosAdapter } from 'axios';
+  ...
+  const mockPort = process.env.MOCK_PORT;
+
+  axios.interceptors.request.use(
+    (config) => {
+      ... 
+
+      const adapter = mockPort
+      ? retryAdapterEnhancer(axios.defaults.adapter as AxiosAdapter, {
+        retryTimes: 1,
+        url: url.replace(/(\/api\/)/g, `/${method}/`),
+        baseURL: `http://127.0.0.1:${mockPort}`,
+      })
+      : axios.defaults.adapter;
+
+      set(config, 'adapter', adapter);
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    },
+  )
+
+```
