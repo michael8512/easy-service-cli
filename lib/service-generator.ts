@@ -5,7 +5,7 @@ import { walker } from './util/file-walker';
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
 import { formatApiPath, formatJson, getSteadyContent, NUMBER_TYPES } from './util/helper';
 import get from 'lodash/get';
-import forEach from 'lodash/get';
+import forEach from 'lodash/forEach';
 
 type ParamsType = 'query' | 'body' | 'path' | 'header';
 
